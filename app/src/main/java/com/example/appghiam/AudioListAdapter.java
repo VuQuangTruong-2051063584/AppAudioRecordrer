@@ -27,42 +27,28 @@ public class AudioListAdapter extends RecyclerView.Adapter<AudioListAdapter.Audi
     ///////////////////////////////////////////////////HIẾU commit
     @NonNull
     @Override
-    public AudioListAdapter.AudioViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return null;
+    public AudioViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.singer_list_item, parent,false);
+        timeAgo = new TimeAgo();
+        return new AudioViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull AudioListAdapter.AudioViewHolder holder, int position) {
-
+    public void onBindViewHolder(@NonNull AudioViewHolder holder, int position) {
+        holder.list_title.setText(allFiles[position].getName());
+        holder.list_date.setText(timeAgo.getTimeAgo(allFiles[position].lastModified()));
     }
 
     @Override
     public int getItemCount() {
-        return 0;
+
+        return allFiles.length;
     }
-
-    public interface onItemListClick {
-
-    }
-
 
     public class AudioViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private ImageButton delete;
-        private ImageButton edit_name_file;
+        private ImageView list_image;
+        private TextView list_title;
+        private TextView list_date;
+        ///////////////////////////////////////////////////SƠN commit
 
-
-        public AudioViewHolder(@NonNull View itemView) {
-            super(itemView);
-
-            delete = itemView.findViewById(R.id.delete_btn);
-            edit_name_file = itemView.findViewById(R.id.edit_btn);
-
-            itemView.setOnClickListener(this);
-        }
-
-        @Override
-        public void onClick(View view) {
-
-        }
-    }
 }
