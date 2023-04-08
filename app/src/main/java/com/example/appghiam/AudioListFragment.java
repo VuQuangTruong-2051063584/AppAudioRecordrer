@@ -1,12 +1,10 @@
-package com.example.audiorecorder;
-///////////////////////////////////////////////////HIẾU commit
-import android.content.DialogInterface;
+package com.example.appghiam;
+
 import android.media.MediaPlayer;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -16,18 +14,16 @@ import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.example.appghiam.AudioListAdapter;
+import com.example.appghiam.R;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 
 public class AudioListFragment extends Fragment implements AudioListAdapter.onItemListClick{
@@ -36,8 +32,6 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
     private BottomSheetBehavior bottomSheetBehavior;
     private RecyclerView audioList;
     private File[] allFiles;
-
-
     private AudioListAdapter audioListAdapter;
     private MediaPlayer mediaPlayer = null;
     private boolean isPlaying = false;
@@ -143,22 +137,24 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
         }
 
     }
-///////////////////////////////////////////////////SƠN commit
-///////////////////////////////////////////////////HIẾU commit
-private void pauseAudio(){
-    mediaPlayer.pause();
-    playBtn.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.playbutton, null));
-    isPlaying = false;
-    seekbarHandler.removeCallbacks(updateSeekbar);
-}
+
+
+
+    private void pauseAudio(){
+        mediaPlayer.pause();
+        playBtn.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.playbutton, null));
+        isPlaying = false;
+        seekbarHandler.removeCallbacks(updateSeekbar);
+    }
     private void resumeAudio(){
         mediaPlayer.start();
-        playBtn.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.player_pause_btn, null));
+        playBtn.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.pause_btn, null));
         isPlaying = true;
         updateRunnable();
         seekbarHandler.postDelayed(updateSeekbar, 0);
 
     }
+
     private void stopAudio() {
         //Stop the audio
         playBtn.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.playbutton, null));
@@ -179,12 +175,11 @@ private void pauseAudio(){
             e.printStackTrace();
         }
 
-        playBtn.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.player_pause_btn, null));
+        playBtn.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.pause_btn, null));
         playFilename.setText(fileToPlay.getName());
         playerHeader.setText("Playing");
         //Play the audio
         isPlaying = true;
-
 
         mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
@@ -216,6 +211,44 @@ private void pauseAudio(){
     public void onStop() {
         super.onStop();
         stopAudio();
+    }
+
+
+    // xoa file
+    @Override
+    public void onDeleteClickListener(int position) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (allFiles.length > 0) {
+                    File fileToDelete = allFiles[position];
+                    if (fileToDelete.exists()) {
+                        boolean isDeleted = fileToDelete.delete();
+                        if (isDeleted) {
+                            File[] newFiles = new File[allFiles.length - 1];
+                            int j = 0;
+                            for (int i = 0; i < allFiles.length; i++) {
+                                if (i != position) {
+                                    newFiles[j++] = allFiles[i];
+                                }
+                            }
+                            allFiles = newFiles;
+                            // Sử dụng runOnUiThread để cập nhật danh sách trên giao diện
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    // Your code to update UI here
+                                    audioListAdapter = new AudioListAdapter(newFiles, AudioListFragment.this);
+                                    audioList.setAdapter(audioListAdapter);
+                                }
+                            });
+
+                        }
+                    }
+                }
+            }
+
+        }).start();
     }
 }
 
