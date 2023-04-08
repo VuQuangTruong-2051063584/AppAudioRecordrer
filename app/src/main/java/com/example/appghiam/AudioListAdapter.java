@@ -10,20 +10,21 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.appghiam.AudioListFragment;
-
 import java.io.File;
 
 public class AudioListAdapter extends RecyclerView.Adapter<AudioListAdapter.AudioViewHolder> {
+    ///////////////////////////////////////////////////trường commit
     private File[] allFiles;
-    private TimeAgo timeAgo;
+
+    //private TimeAgo timeAgo;
     private onItemListClick onItemListClick;
 
-    public AudioListAdapter(File[] allFiles, AudioListFragment onItemListClick) {
+    public AudioListAdapter(File[] allFiles, onItemListClick onItemListClick) {
         this.allFiles = allFiles;
         this.onItemListClick = onItemListClick;
     }
 
+    ///////////////////////////////////////////////////HIẾU commit
     @NonNull
     @Override
     public AudioViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -40,45 +41,14 @@ public class AudioListAdapter extends RecyclerView.Adapter<AudioListAdapter.Audi
 
     @Override
     public int getItemCount() {
+
         return allFiles.length;
-    }
-
-    public interface onItemListClick {
-        void onClickListener(File file, int position);
-
-        void onDeleteClickListener(int position);
-
     }
 
     public class AudioViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private ImageView list_image;
         private TextView list_title;
         private TextView list_date;
-        private ImageButton delete;
+        ///////////////////////////////////////////////////SƠN commit
 
-        private ImageButton edit_name_file;
-
-        @Override
-        public void onClick(View view) {
-
-        }
-
-        public AudioViewHolder(@NonNull View itemView) {
-            super(itemView);
-            itemView.setOnClickListener(this);
-
-
-            delete = itemView.findViewById(R.id.delete_btn);
-            delete.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int position = getAdapterPosition();
-                    if (position != RecyclerView.SCREEN_STATE_ON)
-                        onItemListClick.onDeleteClickListener(position);
-                }
-            });
-        }
-
-
-    }
 }
