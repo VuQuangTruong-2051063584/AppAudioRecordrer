@@ -60,7 +60,7 @@ public class AudioListAdapter extends RecyclerView.Adapter<AudioListAdapter.Audi
 
         @Override
         public void onClick(View view) {
-
+            onItemListClick.onClickListener(allFiles[getAdapterPosition()],getAdapterPosition());
         }
 
         public AudioViewHolder(@NonNull View itemView) {
