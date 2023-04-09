@@ -77,6 +77,19 @@ public class AudioListAdapter extends RecyclerView.Adapter<AudioListAdapter.Audi
                         onItemListClick.onDeleteClickListener(position);
                 }
             });
+
+            list_image = itemView.findViewById(R.id.list_image_view);
+            list_title = itemView.findViewById(R.id.list_title);
+            list_date = itemView.findViewById(R.id.list_date);
+            list_image.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.SCREEN_STATE_ON) {
+                        onItemListClick.onClickListener(allFiles[position], position);
+                    }
+                }
+            });
         }
 
 
