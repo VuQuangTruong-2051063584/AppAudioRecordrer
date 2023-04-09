@@ -87,6 +87,7 @@ public class AudioListAdapter extends RecyclerView.Adapter<AudioListAdapter.Audi
                     int position = getAdapterPosition();
                     if (position != RecyclerView.SCREEN_STATE_ON) {
                         onItemListClick.onClickListener(allFiles[position], position);
+
                     }
                 }
             });
