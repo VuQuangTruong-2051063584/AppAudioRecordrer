@@ -47,6 +47,7 @@ public class AudioListAdapter extends RecyclerView.Adapter<AudioListAdapter.Audi
         void onClickListener(File file, int position);
 
         void onDeleteClickListener(int position);
+        void onEditNameFileClickListener(int position);
 
     }
 
@@ -54,6 +55,8 @@ public class AudioListAdapter extends RecyclerView.Adapter<AudioListAdapter.Audi
         private ImageView list_image;
         private TextView list_title;
         private TextView list_date;
+
+
         private ImageButton delete;
 
         private ImageButton edit_name_file;
@@ -67,6 +70,19 @@ public class AudioListAdapter extends RecyclerView.Adapter<AudioListAdapter.Audi
             super(itemView);
             itemView.setOnClickListener(this);
 
+            list_image = itemView.findViewById(R.id.list_image_view);
+            list_title = itemView.findViewById(R.id.list_title);
+            list_date = itemView.findViewById(R.id.list_date);
+            list_image.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.SCREEN_STATE_ON) {
+                        onItemListClick.onClickListener(allFiles[position], position);
+
+                    }
+                }
+            });
 
             delete = itemView.findViewById(R.id.delete_btn);
             delete.setOnClickListener(new View.OnClickListener() {
@@ -78,16 +94,14 @@ public class AudioListAdapter extends RecyclerView.Adapter<AudioListAdapter.Audi
                 }
             });
 
-            list_image = itemView.findViewById(R.id.list_image_view);
-            list_title = itemView.findViewById(R.id.list_title);
-            list_date = itemView.findViewById(R.id.list_date);
-            list_image.setOnClickListener(new View.OnClickListener() {
+            edit_name_file =  itemView.findViewById(R.id.edit_btn);
+
+            edit_name_file.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View view) {
+                public void onClick(View v) {
                     int position = getAdapterPosition();
                     if (position != RecyclerView.SCREEN_STATE_ON) {
-                        onItemListClick.onClickListener(allFiles[position], position);
-
+                        onItemListClick.onEditNameFileClickListener(position);
                     }
                 }
             });

@@ -1,10 +1,12 @@
 package com.example.appghiam;
 
+import android.content.DialogInterface;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -14,9 +16,11 @@ import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.appghiam.AudioListAdapter;
 import com.example.appghiam.R;
@@ -217,38 +221,94 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
     // xoa file
     @Override
     public void onDeleteClickListener(int position) {
-        new Thread(new Runnable() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Confirm delete");
+        builder.setMessage("Do you want to delete this file?");
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
-            public void run() {
-                if (allFiles.length > 0) {
-                    File fileToDelete = allFiles[position];
-                    if (fileToDelete.exists()) {
-                        boolean isDeleted = fileToDelete.delete();
-                        if (isDeleted) {
-                            File[] newFiles = new File[allFiles.length - 1];
-                            int j = 0;
-                            for (int i = 0; i < allFiles.length; i++) {
-                                if (i != position) {
-                                    newFiles[j++] = allFiles[i];
+            public void onClick(DialogInterface dialog, int which) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (allFiles.length > 0) {
+                            File fileToDelete = allFiles[position];
+                            if (fileToDelete.exists()) {
+                                boolean isDeleted = fileToDelete.delete();
+                                if (isDeleted) {
+                                    File[] newFiles = new File[allFiles.length - 1];
+                                    int j = 0;
+                                    for (int i = 0; i < allFiles.length; i++) {
+                                        if (i != position) {
+                                            newFiles[j++] = allFiles[i];
+                                        }
+                                    }
+                                    allFiles = newFiles;
+                                    // Sử dụng runOnUiThread để cập nhật danh sách trên giao diện
+                                    getActivity().runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            // Your code to update UI here
+                                            audioListAdapter = new AudioListAdapter(newFiles, AudioListFragment.this);
+                                            audioList.setAdapter(audioListAdapter);
+                                        }
+                                    });
                                 }
                             }
-                            allFiles = newFiles;
-                            // Sử dụng runOnUiThread để cập nhật danh sách trên giao diện
-                            getActivity().runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    // Your code to update UI here
-                                    audioListAdapter = new AudioListAdapter(newFiles, AudioListFragment.this);
-                                    audioList.setAdapter(audioListAdapter);
-                                }
-                            });
-
                         }
                     }
+                }).start();
+            }
+        });
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        builder.show();
+    }
+
+    // edit name file
+    @Override
+    public void onEditNameFileClickListener(int position) {
+        // Show a dialog to edit file name
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Edit file name");
+
+        final EditText input = new EditText(getContext());
+        input.setText(allFiles[position].getName());
+
+        builder.setView(input);
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String newName = input.getText().toString().trim();
+                if (!newName.isEmpty()) {
+                    // Step 3: Save new name for file and update list
+                    saveNewFileName(position, newName);
                 }
             }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        builder.show();
+    }
 
-        }).start();
+    private void saveNewFileName(int position, String newName) {
+        File fileToRename = allFiles[position];
+        File newFile = new File(fileToRename.getParent(), newName);
+        boolean isRenamed = fileToRename.renameTo(newFile);
+        if (isRenamed) {
+            allFiles[position] = newFile;
+            audioListAdapter.notifyItemChanged(position);
+        } else {
+            Toast.makeText(getContext(), "Failed to rename file", Toast.LENGTH_SHORT).show();
+        }
     }
 }
 
