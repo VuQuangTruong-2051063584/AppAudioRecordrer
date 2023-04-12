@@ -12,20 +12,19 @@ public class TimeAgo {
         long days = TimeUnit.MILLISECONDS.toDays(now.getTime() - duration);
 
         if (seconds < 60){
-            return  "Just now";
-        }
-        else if (minutes == 1){
-            return "a minute ago";
+            return  "Vừa mới lưu";
+        } else if (minutes == 1){
+            return "lưu một vài phút trước";
         } else if (minutes > 1 && minutes < 60) {
-            return minutes + "minute ago";
+            return "lưu " + minutes + "phút trước";
         } else if (hours == 1) {
-            return "an hour ago";
+            return "lưu gần một giờ trước";
         } else if (hours > 1 && hours < 24) {
-            return  hours + "hour ago";
+            return "lưu " + hours + "hour ago";
         } else if (days == 1) {
-            return "a day ago";
+            return "lưu một ngày trước";
         } else {
-            return days + "day ago";
+            return "lưu "+ days + "ngày trước";
         }
     }
 }

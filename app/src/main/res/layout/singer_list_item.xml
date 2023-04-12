@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:fontFamily="sans-serif-medium"
-        android:text="FileName"
+        android:text="Tên file"
         android:textSize="16sp"
         app:layout_constraintStart_toEndOf="@+id/list_image_view"
         app:layout_constraintTop_toTopOf="@+id/list_image_view" />
@@ -33,7 +33,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:text="TextView"
+        android:text="Thời gian lưu"
         app:layout_constraintBottom_toBottomOf="@+id/list_image_view"
         app:layout_constraintStart_toEndOf="@+id/list_image_view" />
 

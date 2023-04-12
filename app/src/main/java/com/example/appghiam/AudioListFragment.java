@@ -1,5 +1,7 @@
 package com.example.appghiam;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -70,7 +72,6 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
 
         playerSeekbar = view.findViewById(R.id.player_seekbar);
 
-        nextRightplayBtn = view.findViewById(R.id.forwardbuttonright);
 
         String path = getActivity().getExternalFilesDir("/").getAbsolutePath();
         File directory = new File(path);
@@ -127,6 +128,40 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
                 resumeAudio();
             }
         });
+
+        nextRightplayBtn = view.findViewById(R.id.forwardIB);
+        nextLeftplayBtn = view.findViewById(R.id.backwardIB);
+
+        // tiến 1s
+        nextRightplayBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+                    int currentPosition = mediaPlayer.getCurrentPosition();
+                    int duration = mediaPlayer.getDuration();
+                    if (currentPosition + 1000 < duration) {
+                        mediaPlayer.seekTo(currentPosition + 1000);
+                    } else {
+                        mediaPlayer.seekTo(duration);
+                    }
+                }
+            }
+        });
+        // lùi 1s
+        nextLeftplayBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+                    int currentPosition = mediaPlayer.getCurrentPosition();
+                    int p = currentPosition - 1000;
+                    if (p < 0) {
+                        p = 0;
+                    }
+                    mediaPlayer.seekTo(p);
+                }
+            }
+        });
+
     }
 
     @Override
@@ -156,17 +191,27 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
         isPlaying = true;
         updateRunnable();
         seekbarHandler.postDelayed(updateSeekbar, 0);
+    }
 
+    private Activity parentActivity;
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        parentActivity = (Activity) context;
     }
 
     private void stopAudio() {
-        //Stop the audio
-        playBtn.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.playbutton, null));
-        playerHeader.setText("Stopped");
-        isPlaying = false;
-        mediaPlayer.stop();
-        seekbarHandler.removeCallbacks(updateSeekbar);
+        if (mediaPlayer != null && parentActivity != null) {
+            //dung audio
+            playBtn.setImageDrawable(parentActivity.getResources().getDrawable(R.drawable.playbutton, null));
+            playerHeader.setText("Stopped");
+            isPlaying = false;
+            mediaPlayer.stop();
+            seekbarHandler.removeCallbacks(updateSeekbar);
+        }
     }
+
 
     private void playAudio(File fileToPlay) {
         mediaPlayer = new MediaPlayer();
@@ -178,8 +223,10 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        playBtn.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.pause_btn, null));
+        Activity activity = getActivity();
+        if (activity != null) {
+            playBtn.setImageDrawable(activity.getResources().getDrawable(R.drawable.pause_btn, null));
+        }
         playFilename.setText(fileToPlay.getName());
         playerHeader.setText("Playing");
         //Play the audio
@@ -217,14 +264,17 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
         stopAudio();
     }
 
-
     // xoa file
     @Override
     public void onDeleteClickListener(int position) {
+
+        onStop();
+        File fileToRename = allFiles[position];
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle("Confirm delete");
-        builder.setMessage("Do you want to delete this file?");
-        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+        builder.setTitle("Xác nhận xóa");
+        builder.setMessage("Bạn có chắc chắn xóa file " + fileToRename.getName() +"?");
+        builder.setPositiveButton("Đồng ý", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 new Thread(new Runnable() {
@@ -247,7 +297,6 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
                                     getActivity().runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
-                                            // Your code to update UI here
                                             audioListAdapter = new AudioListAdapter(newFiles, AudioListFragment.this);
                                             audioList.setAdapter(audioListAdapter);
                                         }
@@ -259,7 +308,7 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
                 }).start();
             }
         });
-        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton("Không", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
@@ -273,24 +322,24 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
     public void onEditNameFileClickListener(int position) {
         // Show a dialog to edit file name
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle("Edit file name");
+        builder.setTitle("Sửa tên file");
 
         final EditText input = new EditText(getContext());
         input.setText(allFiles[position].getName());
 
         builder.setView(input);
 
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("Đồng ý", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String newName = input.getText().toString().trim();
                 if (!newName.isEmpty()) {
-                    // Step 3: Save new name for file and update list
+                    //Lưu tên mới và update list
                     saveNewFileName(position, newName);
                 }
             }
         });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton("Không", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
@@ -307,7 +356,7 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
             allFiles[position] = newFile;
             audioListAdapter.notifyItemChanged(position);
         } else {
-            Toast.makeText(getContext(), "Failed to rename file", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Đổi tên file thất bại", Toast.LENGTH_SHORT).show();
         }
     }
 }

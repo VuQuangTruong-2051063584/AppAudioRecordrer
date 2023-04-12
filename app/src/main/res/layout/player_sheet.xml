@@ -89,7 +89,7 @@
         app:srcCompat="@drawable/playbutton" />
 
     <ImageButton
-        android:id="@+id/forwardbuttonright"
+        android:id="@+id/forwardIB"
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:background="#00000000"
@@ -98,10 +98,10 @@
         app:layout_constraintHorizontal_bias="0.518"
         app:layout_constraintStart_toEndOf="@+id/player_play_btn"
         app:layout_constraintTop_toTopOf="@+id/player_play_btn"
-        app:srcCompat="@drawable/forwardbuttonright" />
+        app:srcCompat="@drawable/forwardbutton" />
 
     <ImageButton
-        android:id="@+id/forwardbuttonleft"
+        android:id="@+id/backwardIB"
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:background="#00000000"
@@ -109,7 +109,7 @@
         app:layout_constraintEnd_toStartOf="@+id/player_play_btn"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/player_play_btn"
-        app:srcCompat="@drawable/forwardbuttonleft" />
+        app:srcCompat="@drawable/backwardbutton" />
     <SeekBar
         android:id="@+id/player_seekbar"
         android:layout_margin="32dp"

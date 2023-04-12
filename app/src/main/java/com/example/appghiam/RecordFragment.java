@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 public class RecordFragment extends Fragment implements View.OnClickListener {
 
@@ -41,6 +42,7 @@ public class RecordFragment extends Fragment implements View.OnClickListener {
     private String recordFile;
     private Chronometer timer;
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -55,6 +57,7 @@ public class RecordFragment extends Fragment implements View.OnClickListener {
         listBtn = view.findViewById(R.id.record_list_btn);
         recordBtn = view.findViewById(R.id.record_btn);
         timer = view.findViewById(R.id.record_timer);
+//        timer.setFormat("(00:%s)");
         filenameText = view.findViewById(R.id.record_filename);
         listBtn.setOnClickListener(this);
         recordBtn.setOnClickListener(this);
@@ -107,9 +110,9 @@ public class RecordFragment extends Fragment implements View.OnClickListener {
         timer.start();
 
         String recordPath = getActivity().getExternalFilesDir("/").getAbsolutePath();
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MM_dd_hh_mm_ss", Locale.TAIWAN);
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MM_dd_hh_mm_ss", new Locale("vi", "VN"));
         Date now = new Date();
-        recordFile = "Recording_" +formatter.format(now) +".3gpp" ;
+        recordFile = "Recording_" +formatter.format(now) +".mp3" ;
 
         filenameText.setText("Recording, file Name : " +recordFile);
 
