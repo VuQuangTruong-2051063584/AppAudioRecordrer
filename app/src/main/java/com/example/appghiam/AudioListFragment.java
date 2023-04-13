@@ -15,7 +15,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Handler;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -45,12 +47,20 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
 
     private ImageButton playBtn;
     private ImageButton nextRightplayBtn;
+
+    private int forwardClickCount = 0;
     private ImageButton nextLeftplayBtn;
     private TextView playerHeader;
     private TextView playFilename;
     private SeekBar playerSeekbar;
     private Handler seekbarHandler;
     private Runnable updateSeekbar;
+    private int currentFileIndex = -1;
+
+    private long DOUBLE_CLICK_TIME_DELTA = 300; // milliseconds
+    private long[] lastClickTime = {0, 0};
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -133,34 +143,82 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
         nextLeftplayBtn = view.findViewById(R.id.backwardIB);
 
         // tiến 1s
-        nextRightplayBtn.setOnClickListener(new View.OnClickListener() {
+//        nextRightplayBtn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+//                    int currentPosition = mediaPlayer.getCurrentPosition();
+//                    int duration = mediaPlayer.getDuration();
+//                    if (currentPosition + 1000 < duration) {
+//                        mediaPlayer.seekTo(currentPosition + 1000);
+//                    } else {
+//                        mediaPlayer.seekTo(duration);
+//                    }
+//                } else {
+//
+//                }
+//            }
+//        });
+
+
+
+        GestureDetector gestureDetectorNextRight = new GestureDetector(getContext(), new GestureDetector.SimpleOnGestureListener() {
             @Override
-            public void onClick(View view) {
-                if (mediaPlayer != null && mediaPlayer.isPlaying()) {
-                    int currentPosition = mediaPlayer.getCurrentPosition();
-                    int duration = mediaPlayer.getDuration();
-                    if (currentPosition + 1000 < duration) {
-                        mediaPlayer.seekTo(currentPosition + 1000);
-                    } else {
-                        mediaPlayer.seekTo(duration);
-                    }
-                }
+            public boolean onDoubleTap(MotionEvent e) {
+                handleDoubleClick(true);
+                return true;
+            }
+
+            @Override
+            public boolean onSingleTapConfirmed(MotionEvent e) {
+                handleSingleClick(true);
+                return true;
             }
         });
+
         // lùi 1s
-        nextLeftplayBtn.setOnClickListener(new View.OnClickListener() {
+//        nextLeftplayBtn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+//                    int currentPosition = mediaPlayer.getCurrentPosition();
+//                    int p = currentPosition - 1000;
+//                    if (p < 0) {
+//                        p = 0;
+//                    }
+//                    mediaPlayer.seekTo(p);
+//                }
+//            }
+//        });
+        nextRightplayBtn.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View view) {
-                if (mediaPlayer != null && mediaPlayer.isPlaying()) {
-                    int currentPosition = mediaPlayer.getCurrentPosition();
-                    int p = currentPosition - 1000;
-                    if (p < 0) {
-                        p = 0;
-                    }
-                    mediaPlayer.seekTo(p);
-                }
+            public boolean onTouch(View v, MotionEvent event) {
+                return gestureDetectorNextRight.onTouchEvent(event);
             }
         });
+
+        GestureDetector gestureDetectorNextLeft = new GestureDetector(getContext(), new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onDoubleTap(MotionEvent e) {
+                handleDoubleClick(false);
+                return true;
+            }
+
+            @Override
+            public boolean onSingleTapConfirmed(MotionEvent e) {
+                handleSingleClick(false);
+                return true;
+            }
+        });
+
+        nextLeftplayBtn.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    return gestureDetectorNextLeft.onTouchEvent(event);
+                }
+            });
+
+
 
     }
 
@@ -202,6 +260,7 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
     }
 
     private void stopAudio() {
+        forwardClickCount = 0;
         if (mediaPlayer != null && parentActivity != null) {
             //dung audio
             playBtn.setImageDrawable(parentActivity.getResources().getDrawable(R.drawable.playbutton, null));
@@ -214,6 +273,19 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
 
 
     private void playAudio(File fileToPlay) {
+
+        int index = -1;
+        for (int i = 0; i < allFiles.length; i++) {
+            if (allFiles[i].equals(fileToPlay)) {
+                index = i;
+                break;
+            }
+        }
+
+        if (index != -1) {
+            currentFileIndex = index;
+        }
+
         mediaPlayer = new MediaPlayer();
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
         try {
@@ -359,5 +431,60 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
             Toast.makeText(getContext(), "Đổi tên file thất bại", Toast.LENGTH_SHORT).show();
         }
     }
+
+//    private void handleDoubleClick(Boolean b) {
+//        if (b == true){
+//            if (currentFileIndex + 1 >= allFiles.length) {
+//                currentFileIndex = 0;
+//            } else {
+//                currentFileIndex++;
+//            }
+//        } else {
+//        }
+//        playAudio(allFiles[currentFileIndex]);
+//
+//    }
+
+    private void handleDoubleClick(Boolean b) {
+        int nextIndex;
+        if (b == true) {
+            nextIndex = currentFileIndex + 1;
+            if (nextIndex >= allFiles.length) {
+                nextIndex = 0;
+            }
+        } else {
+            nextIndex = currentFileIndex - 1;
+            if (nextIndex < 0) {
+                nextIndex = allFiles.length - 1;
+            }
+        }
+        playAudio(allFiles[nextIndex]);
+        currentFileIndex = nextIndex;
+    }
+
+    private void handleSingleClick(Boolean b) {
+        if (b == true) {
+            if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+                int currentPosition = mediaPlayer.getCurrentPosition();
+                int duration = mediaPlayer.getDuration();
+                if (currentPosition + 1000 < duration) {
+                    mediaPlayer.seekTo(currentPosition + 1000);
+                } else {
+                    mediaPlayer.seekTo(duration);
+                }
+            }
+        } else {
+            if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+                    int currentPosition = mediaPlayer.getCurrentPosition();
+                    int p = currentPosition - 1000;
+                    if (p < 0) {
+                        p = 0;
+                    }
+                    mediaPlayer.seekTo(p);
+                }
+        }
+
+    }
+
 }
 
