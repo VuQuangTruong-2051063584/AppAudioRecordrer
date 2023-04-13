@@ -33,6 +33,7 @@ public class RecordFragment extends Fragment implements View.OnClickListener {
 
     private NavController navController;
     private ImageButton listBtn;
+    private ImageButton listBtn2;
     private ImageButton recordBtn;
     private TextView filenameText;
     private boolean isRecording = false;
@@ -57,7 +58,6 @@ public class RecordFragment extends Fragment implements View.OnClickListener {
         listBtn = view.findViewById(R.id.record_list_btn);
         recordBtn = view.findViewById(R.id.record_btn);
         timer = view.findViewById(R.id.record_timer);
-//        timer.setFormat("(00:%s)");
         filenameText = view.findViewById(R.id.record_filename);
         listBtn.setOnClickListener(this);
         recordBtn.setOnClickListener(this);
@@ -71,7 +71,7 @@ public class RecordFragment extends Fragment implements View.OnClickListener {
                 if (isRecording){
 
                     AlertDialog.Builder alertDialog = new AlertDialog.Builder(getContext());
-                    alertDialog.setPositiveButton("OKAY", new DialogInterface.OnClickListener() {
+                    alertDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int which) {
 
@@ -79,9 +79,9 @@ public class RecordFragment extends Fragment implements View.OnClickListener {
                             isRecording = false;
                         }
                     });
-                    alertDialog.setNegativeButton("CANCEL", null);
-                    alertDialog.setTitle("Audio Still recording");
-                    alertDialog.setMessage("Are you sure, you want to stop the recording?");
+                    alertDialog.setNegativeButton("Thoát", null);
+                    alertDialog.setTitle("Âm thanh Vẫn đang ghi âm");
+                    alertDialog.setMessage("Bạn có chắc chắn muốn dừng ghi âm không?");
                     alertDialog.create().show();
                 }else {
                     navController.navigate(R.id.action_recordFragment_to_audioListFragment);
@@ -102,8 +102,10 @@ public class RecordFragment extends Fragment implements View.OnClickListener {
                     }
                     break;
                 }
+
         }
     }
+
 
     private void startRecording() {
         timer.setBase(SystemClock.elapsedRealtime());
@@ -112,9 +114,9 @@ public class RecordFragment extends Fragment implements View.OnClickListener {
         String recordPath = getActivity().getExternalFilesDir("/").getAbsolutePath();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MM_dd_hh_mm_ss", new Locale("vi", "VN"));
         Date now = new Date();
-        recordFile = "Recording_" +formatter.format(now) +".mp3" ;
+        recordFile = "Record_" +formatter.format(now) +".mp3" ;
 
-        filenameText.setText("Recording, file Name : " +recordFile);
+        filenameText.setText("Ghi Âm, file : " +recordFile);
 
         mediaRecorder = new MediaRecorder();
         mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
@@ -133,7 +135,7 @@ public class RecordFragment extends Fragment implements View.OnClickListener {
 
     private void stopRecording() {
         timer.stop();
-        filenameText.setText("Recording Stopped, file Saved : " +recordFile);
+        filenameText.setText("Dừng Ghi Âm, Lưu File : " +recordFile);
         mediaRecorder.stop();
         mediaRecorder.release();
         mediaRecorder = null;

@@ -16,10 +16,12 @@
             app:exitAnim="@anim/fade_out"
             app:enterAnim="@anim/slide_in"
             />
+
     </fragment>
     <fragment
         android:id="@+id/audioListFragment"
         android:name="com.example.appghiam.AudioListFragment"
         android:label="fragment_audio_list"
         tools:layout="@layout/fragment_audio_list" />
+
 </navigation>

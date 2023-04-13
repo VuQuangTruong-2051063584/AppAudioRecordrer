@@ -242,6 +242,7 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
         playBtn.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.playbutton, null));
         isPlaying = false;
         seekbarHandler.removeCallbacks(updateSeekbar);
+
     }
     private void resumeAudio(){
         mediaPlayer.start();
@@ -264,7 +265,7 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
         if (mediaPlayer != null && parentActivity != null) {
             //dung audio
             playBtn.setImageDrawable(parentActivity.getResources().getDrawable(R.drawable.playbutton, null));
-            playerHeader.setText("Stopped");
+            playerHeader.setText("Dừng");
             isPlaying = false;
             mediaPlayer.stop();
             seekbarHandler.removeCallbacks(updateSeekbar);
@@ -300,7 +301,7 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
             playBtn.setImageDrawable(activity.getResources().getDrawable(R.drawable.pause_btn, null));
         }
         playFilename.setText(fileToPlay.getName());
-        playerHeader.setText("Playing");
+        playerHeader.setText("Đang chạy");
         //Play the audio
         isPlaying = true;
 
@@ -308,7 +309,7 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
                 stopAudio();
-                playerHeader.setText("Finished");
+                playerHeader.setText("Kết Thúc");
             }
         });
 
@@ -330,11 +331,11 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
         };
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        stopAudio();
-    }
+//    @Override
+//    public void onStop() {
+//        super.onStop();
+//        stopAudio();
+//    }
 
     // xoa file
     @Override
@@ -357,7 +358,7 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
                             if (fileToDelete.exists()) {
                                 boolean isDeleted = fileToDelete.delete();
                                 if (isDeleted) {
-                                    File[] newFiles = new File[allFiles.length - 1];
+                                    File[] newFiles = new File[allFiles.length -1];
                                     int j = 0;
                                     for (int i = 0; i < allFiles.length; i++) {
                                         if (i != position) {

@@ -38,7 +38,7 @@
             android:fontFamily="sans-serif-black"
             android:paddingTop="8dp"
             android:paddingBottom="8dp"
-            android:text="Media Player"
+            android:text="Audio Player"
             android:textColor="@color/white"
             android:textSize="16dp" />
 
@@ -52,7 +52,7 @@
             android:paddingTop="8dp"
             android:paddingEnd="8dp"
             android:paddingBottom="8dp"
-            android:text="Not Playing"
+            android:text="Không chạy"
             android:textAlignment="textEnd"
             android:textColor="@color/white"
             android:textSize="16dp" />
